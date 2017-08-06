@@ -31,19 +31,17 @@ def handle_command(command, channel):
     """
     response = "Not sure what you mean. Use the *" + EXAMPLE_COMMAND + \
                "* command with numbers, delimited by spaces."
-               
-    if command.startswith('add'):
-        phrase = command.split('add')[1]
-        handle_add(phrase)
 
     # slack_client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
     if command.startswith('summary'):
-        handle_summary() #post summary.
+        handle_summary(channel) #post summary.
 
+    else:
+        handle_add(command, channel)
 
 def handle_add(phrase, channel):
     """
-       sends the phrase to Nut API and adds result to dataframe.
+       sends the phrase to Nut API and adds result to DB
     """
     response = send_nut_query(form_nut_query(phrase))
     
@@ -68,9 +66,23 @@ def handle_add(phrase, channel):
         slack_client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
         
 
-def handle_summary():
-    # query dataframe for relevant parameters
-    # calculate total calories
+def handle_summary(channel):
+    """
+       returns summary of food consumed and report total calories
+    """
+    summary = ""
+    calories = 0
+    for food in records:
+        message = food["food_name"] + " - " + food["serving_qty"] + " - " + \
+                  food["nf_calories"] + "\n"
+        summary = summary + message
+        calories += food["nf_calories"]
+    slack_client.api_call("chat.postMessage", channel=channel, text=summary, as_user=True)
+    
+    # send total calories count
+    calories_msg = "You had " + calories + " calories"
+    slack_client.api_call("chat.postMessage", channel=channel, text=calories_msg, as_user=True)
+
 
 def parse_slack_output(slack_rtm_output):
     """
@@ -127,9 +139,3 @@ def form_nut_query(phrase):
     
     return query
 
-
-        
-        
-
-
-    
