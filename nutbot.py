@@ -3,6 +3,8 @@ import time
 from slackclient import SlackClient
 
 import requests
+import pandas as pd
+
 
 # starterbot's ID as an environment variable
 BOT_ID = os.environ.get("NUTBOT_ID")
@@ -12,8 +14,10 @@ NUT_KEY = os.environ.get("NUT_API_KEY")
 
 # constants
 AT_BOT = "<@" + BOT_ID + ">"
-
 EXAMPLE_COMMAND = ['add', 'summary']
+
+# data store
+records = []
 
 # instantiate Slack & Twilio clients
 slack_client = SlackClient(os.environ.get('NUTBOT_TOKEN'))
@@ -36,14 +40,33 @@ def handle_command(command, channel):
     if command.startswith('summary'):
         handle_summary() #post summary.
 
-def handle_add(phrase):
+
+def handle_add(phrase, channel):
     """
        sends the phrase to Nut API and adds result to dataframe.
     """
-    result = send_nut_query(form_nut_query(phrase))
-    # if not found item exits in result, prompt to rephrase
-    # add to dataframe
+    response = send_nut_query(form_nut_query(phrase))
+    
+    if not response["foods"]:
+        print("list of foods in api response is empty")
 
+    # send slack msg wrt each food and add to DB
+    for food in response["foods"]:
+        # send msg
+        message = food["food_name"] + " - " + food["serving_qty"] + " - " + \
+                  food["nf_calories"]
+        slack_client.api_call("chat.postMessage", channel=channel, \
+                text=response, as_user=True)
+        
+        # add to DB
+        records.append(food)
+
+    # if unmatched items exist, prompt to rephrase
+    if response['unmatched']:
+        message = "NutBot did not recognize " + response['unmatched'] + \
+                "please rephrase the query"
+        slack_client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
+        
 
 def handle_summary():
     # query dataframe for relevant parameters
