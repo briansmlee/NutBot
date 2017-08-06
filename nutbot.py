@@ -14,6 +14,12 @@ NUT_KEY = os.environ.get("NUT_API_KEY")
 
 # constants
 AT_BOT = "<@" + BOT_ID + ">"
+NUT_URL = 'https://trackapi.nutritionix.com/v2/natural/nutrients'
+NUT_HEADERS = {
+        "x-app-id": NUT_ID,
+        "x-app-key": NUT_KEY,
+        "x-remote-user-id": 0
+        }
 EXAMPLE_COMMAND = ['add', 'summary']
 
 # data store
@@ -117,12 +123,12 @@ def send_nut_query(query):
     """
        Sends json query to Nutritionix API and returns result
     """
-    url = 'https://api.nutritionix.com/v1_1/search'
-    # need headers?
-    r = requests.post(url, data=query)
-    # r = requests.post(url, data=json.dumps(payload))
-    print r.text
-    return r
+    response = requests.post(NUT_URL, data=query, headers=NUT_HEADERS)
+    response_dict = response.json()
+    print "NUT API response is: \n\n\n" + response.text
+    print "DICT ver: \n\n\n" + response_dict
+
+    return response_dict
 
 
 def form_nut_query(phrase):
@@ -131,11 +137,10 @@ def form_nut_query(phrase):
        the Nutritionix NLP API parses command
     """
     query = {
-        'appId': NUT_API_ID,
-        'appKey': NUT_API_KEY,
         'query': phrase,
-        'fields': '*'
+        #'appId': NUT_API_ID,
+        #'appKey': NUT_API_KEY,
+        #'fields': '*'
     }
-    
     return query
 
