@@ -68,13 +68,13 @@ def handle_add(phrase, channel):
         message = str(food["food_name"]) + " - " + str(food["serving_qty"]) + " - " + \
                   str(food["nf_calories"])
         slack_client.api_call("chat.postMessage", channel=channel, \
-                text=response, as_user=True)
+                text=message, as_user=True)
         
         # add to DB
         records.append(food)
 
     # if unmatched items exist, prompt to rephrase
-    if response['unmatched']:
+    if 'unmatched' in response.keys() and response['unmatched']:
         message = "NutBot did not recognize " + response['unmatched'] + \
                 "please rephrase the query"
         slack_client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
@@ -84,7 +84,7 @@ def handle_summary(channel):
     """
        returns summary of food consumed and report total calories
     """
-    jummary = ""
+    summary = ""
     calories = 0
     for food in records:
         message = str(food["food_name"]) + " - " + str(food["serving_qty"]) + " - " + \
@@ -94,7 +94,7 @@ def handle_summary(channel):
     slack_client.api_call("chat.postMessage", channel=channel, text=summary, as_user=True)
     
     # send total calories count
-    calories_msg = "You had " + calories + " calories"
+    calories_msg = "You had " + str(calories) + " calories"
     slack_client.api_call("chat.postMessage", channel=channel, text=calories_msg, as_user=True)
 
 
@@ -122,7 +122,7 @@ def send_nut_query(query):
     """
     response = requests.post(NUT_URL, data=query, headers=NUT_HEADERS)
     response_dict = response.json()
-    print ("NUT API response is: \n\n\n" + response.text)
+    # print ("NUT API response is: \n\n\n" + response.text)
     # print ("DICT ver: \n\n\n" + response_dict)
 
     return response_dict
