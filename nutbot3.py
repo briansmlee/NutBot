@@ -2,6 +2,7 @@ import os
 import time
 import requests
 import json
+import sqlite3
 
 from slackclient import SlackClient
 from settings import BOT_ID, BOT_TOKEN, NUT_ID, NUT_KEY
