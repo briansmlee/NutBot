@@ -3,6 +3,7 @@ import time
 import requests
 import json
 import sqlite3
+import datetime
 
 from slackclient import SlackClient
 from settings import BOT_ID, BOT_TOKEN, NUT_ID, NUT_KEY
@@ -33,8 +34,14 @@ FOOD_KEYS = {'nf_calories':'calories', 'food_name':'name', 'serving_qty':'quanti
 # instantiate Slack clnt
 slack_client = SlackClient(BOT_TOKEN)
 
+
+
 def filter_keys(dct, keys):
-    return { new_key: dct[old_key] for old_key, new_key in keys.items() }
+    new_dct = { new_key: dct[old_key] for old_key, new_key in keys.items() }
+    new_dct['date_time'] = datetime.datetime.now()
+    return new_dct
+
+
 
 def handle_command(command, channel):
     """
@@ -51,6 +58,8 @@ def handle_command(command, channel):
 
     else:
         handle_add(command, channel)
+
+
 
 def handle_add(phrase, channel):
     """
@@ -70,7 +79,7 @@ def handle_add(phrase, channel):
     for food in response["foods"]:
         # add msg
         add_msg = str(food["food_name"]) + " - " + str(food["serving_qty"]) + " - " + \
-                  str(food["nf_calories"])
+                  str(food["nf_calories"]) + '\n'
         message += add_msg
         
         # add to db
@@ -103,6 +112,8 @@ def handle_summary(channel):
         summary = summary + message
         calories += food["nf_calories"]
     slack_client.api_call("chat.postMessage", channel=channel, text=summary, as_user=True)
+    
+    db_all_foods() 
     
     # send total calories count
     calories_msg = "You had " + str(calories) + " calories"
