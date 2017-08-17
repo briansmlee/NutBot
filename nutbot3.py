@@ -7,7 +7,7 @@ import datetime
 
 from slackclient import SlackClient
 from settings import BOT_ID, BOT_TOKEN, NUT_ID, NUT_KEY
-from db import db_add_food, db_all_foods
+from db import db_add_food, db_all_foods, db_daily_summary
 from pprint import pprint
 # import pandas as pd
 
@@ -113,7 +113,8 @@ def handle_summary(channel):
         calories += food["nf_calories"]
     slack_client.api_call("chat.postMessage", channel=channel, text=summary, as_user=True)
     
-    db_all_foods() 
+    db_daily_summary()
+    # db_all_foods() 
     
     # send total calories count
     calories_msg = "You had " + str(calories) + " calories"

@@ -2,6 +2,7 @@
 # sqlite connection for nutbot
 
 import sqlite3
+import datetime
 from sqlalchemy import *
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -43,4 +44,12 @@ def db_add_food(dct):
 def db_all_foods():
     for instance in session.query(Food).order_by(Food.id):
         print(instance) # ok?
+
+
+def db_daily_summary():
+    today = datetime.datetime.now()
+    start = today.replace(hour=0, minute=0, second=0)
+    
+    for food in session.query(Food).filter(Food.date_time > start).order_by(Food.id):
+        print(food)
 
