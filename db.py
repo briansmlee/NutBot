@@ -31,6 +31,7 @@ print(ex_food.name)
 
 # create session
 Session = sessionmaker(bind=engine)
+session = Session()
 
 # persist User obj by adding to Session
 session.add(ex_food)
@@ -39,8 +40,6 @@ session.add(ex_food)
 session.add_all([
     Foods(name='avocado', quantity=1, calories = 100.0)
 ])
-
-print(session.new)
 
 session.commit()
 
