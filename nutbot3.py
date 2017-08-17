@@ -6,18 +6,17 @@ import sqlite3
 
 from slackclient import SlackClient
 from settings import BOT_ID, BOT_TOKEN, NUT_ID, NUT_KEY
-# from pprint import 
-
+from db import db_add_food, db_all_foods
+from pprint import pprint
 # import pandas as pd
 
 
+# getting following vars from settings.py
 # starterbot's ID as an environment variable
 # BOT_ID = os.environ.get("NUTBOT_ID")
 # NUT_ID = os.environ.get("NUT_API_ID")
 # NUT_KEY = os.environ.get("NUT_API_KEY")
 # BOT_TOKEN = os.environ.get("NUTBOT_TOKEN")
-
-# get from settings.py
 
 
 # constants
@@ -29,13 +28,13 @@ NUT_HEADERS = {
         "x-remote-user-id": '0'
         }
 EXAMPLE_COMMAND = ['add', 'summary']
+FOOD_KEYS = {'nf_calories':'calories', 'food_name':'name', 'serving_qty':'quantity'}
 
-# data store
-records = []
-
-# instantiate Slack & Twilio clients
+# instantiate Slack clnt
 slack_client = SlackClient(BOT_TOKEN)
 
+def filter_keys(dct, keys):
+    return { new_key: dct[old_key] for old_key, new_key in keys.items() }
 
 def handle_command(command, channel):
     """
@@ -58,22 +57,30 @@ def handle_add(phrase, channel):
        sends the phrase to Nut API and adds result to DB
     """
     response = send_nut_query(form_nut_query(phrase))
-    print (json.dumps(response, indent=4))
+    
+    #debugging
+    #print (json.dumps(response, indent=4))
     
     if not response["foods"]:
         print("list of foods in api response is empty")
+    
+    message = ''
 
     # send slack msg wrt each food and add to DB
     for food in response["foods"]:
-        # send msg
-        message = str(food["food_name"]) + " - " + str(food["serving_qty"]) + " - " + \
+        # add msg
+        add_msg = str(food["food_name"]) + " - " + str(food["serving_qty"]) + " - " + \
                   str(food["nf_calories"])
-        slack_client.api_call("chat.postMessage", channel=channel, \
+        message += add_msg
+        
+        # add to db
+        db_add_food(filter_keys(food, FOOD_KEYS))
+
+    slack_client.api_call("chat.postMessage", channel=channel, \
                 text=message, as_user=True)
         
-        # add to DB
-        records.append(food)
-
+    
+    # needs fix
     # if unmatched items exist, prompt to rephrase
     if 'unmatched' in response.keys() and response['unmatched']:
         message = "NutBot did not recognize " + response['unmatched'] + \
@@ -87,6 +94,9 @@ def handle_summary(channel):
     """
     summary = ""
     calories = 0
+
+    # needs to change sqlite to dict
+    records = []
     for food in records:
         message = str(food["food_name"]) + " - " + str(food["serving_qty"]) + " - " + \
                   str(food["nf_calories"]) + "\n"

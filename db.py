@@ -10,8 +10,13 @@ engine = create_engine('sqlite:///tutorial.db')
 
 Base = declarative_base() 
 
-class Foods(Base):
-    __tablename__ = 'foods'
+# create session
+Session = sessionmaker(bind=engine)
+session = Session()
+
+
+class Food(Base):
+    __tablename__ = 'food'
     
     id = Column(Integer, primary_key = True)
     name = Column(String)
@@ -23,31 +28,15 @@ class Foods(Base):
         return "<User(name=%s, quantity=%d, calories=%f>" % \
                 self.name, self.quantity, self.calories
 
+
 Base.metadata.create_all(engine)
 
-ex_food = Foods(name='milk', quantity= 1, calories=120.0)
-
-print(ex_food.name)
-
-# create session
-Session = sessionmaker(bind=engine)
-session = Session()
-
-# persist User obj by adding to Session
-session.add(ex_food)
-# now the instance is pending.
-
-session.add_all([
-    Foods(name='avocado', quantity=1, calories = 100.0)
-])
-
-session.commit()
-
-print(ex_food.id)
-
-for instance in session.query(Foods).order_by(Foods.id):
-    print(instance.name, instance.quantity)
+def db_add_food(dct):
+    food = Food(**dct) # unfolds dict
+    session.add(food)
+    session.commit()
     
-
-
+def db_all_foods():
+    for instance in session.query(Food).order_by(Food.id):
+        print(instance) # ok?
 
