@@ -9,8 +9,7 @@ from sqlalchemy.orm import sessionmaker
 
 fmt = "%Y-%m-%d %H:%M:%S %Z"
 
-
-engine = create_engine('sqlite:///tutorial1.db')
+engine = create_engine('sqlite:///ver1.db')
 
 Base = declarative_base() 
 
@@ -27,16 +26,17 @@ class Food(Base):
     name = Column(String)
     quantity = Column(Integer)
     calories = Column(Float)
+    user = Column(String)
     
     # optional
     def __repr__(self):
-        return "<Food: datetime=%s name=%s, quantity=%d, calories=%f>" % \
-                (self.date_time.strftime(fmt), self.name, self.quantity, self.calories)
-
+        return "<Food: datetime=%s name=%s, quantity=%d, calories=%f user=%s>" % \
+                (self.date_time.strftime(fmt), self.name, self.quantity, self.calories, self.user)
 
 Base.metadata.create_all(engine)
 
-def db_add_food(dct):
+def db_add_food(dct, user):
+    dct['user'] = user
     food = Food(**dct) # unfolds dict
     session.add(food)
     session.commit()

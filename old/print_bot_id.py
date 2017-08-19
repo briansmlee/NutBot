@@ -1,11 +1,12 @@
 import os
 from slackclient import SlackClient
-from settings import BOT_TOKEN
+# from slackclient import SlackClient
+from settings import SLACK_TOKEN
 
 BOT_NAME = 'nutbot'
 
 # slack_client = SlackClient(os.environ.get('NUTBOT_TOKEN'))
-slack_client = SlackClient(BOT_TOKEN)
+slack_client = SlackClient(SLACK_TOKEN)
 
 if __name__ == "__main__":
     api_call = slack_client.api_call("users.list")

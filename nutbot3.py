@@ -6,11 +6,10 @@ import sqlite3
 import datetime
 
 from slackclient import SlackClient
-from settings import BOT_ID, BOT_TOKEN, NUT_ID, NUT_KEY
+from settings import SLACK_ID, SLACK_TOKEN, NUT_ID, NUT_KEY
 from db import db_add_food, db_all_foods, db_daily_summary
 from pprint import pprint
 # import pandas as pd
-
 
 # getting following vars from settings.py
 # starterbot's ID as an environment variable
@@ -21,7 +20,7 @@ from pprint import pprint
 
 
 # constants
-AT_BOT = "<@" + BOT_ID + ">"
+AT_BOT = "<@" + SLACK_ID + ">"
 NUT_URL = 'https://trackapi.nutritionix.com/v2/natural/nutrients'
 NUT_HEADERS = {
         "x-app-id": NUT_ID,
@@ -32,7 +31,7 @@ EXAMPLE_COMMAND = ['add', 'summary']
 FOOD_KEYS = {'nf_calories':'calories', 'food_name':'name', 'serving_qty':'quantity'}
 
 # instantiate Slack clnt
-slack_client = SlackClient(BOT_TOKEN)
+slack_client = SlackClient(SLACK_TOKEN)
 
 
 
@@ -43,7 +42,7 @@ def filter_keys(dct, keys):
 
 
 
-def handle_command(command, channel):
+def handle_command(command, channel, user):
     """
         Receives commands directed at the bot and determines if they
         are valid commands. If so, then acts on the commands. If not,
@@ -57,11 +56,11 @@ def handle_command(command, channel):
         handle_summary(channel) #post summary.
 
     else:
-        handle_add(command, channel)
+        handle_add(command, channel, user)
 
 
 
-def handle_add(phrase, channel):
+def handle_add(phrase, channel, user):
     """
        sends the phrase to Nut API and adds result to DB
     """
@@ -83,7 +82,7 @@ def handle_add(phrase, channel):
         message += add_msg
         
         # add to db
-        db_add_food(filter_keys(food, FOOD_KEYS))
+        db_add_food(filter_keys(food, FOOD_KEYS), user)
 
     slack_client.api_call("chat.postMessage", channel=channel, \
                 text=message, as_user=True)
@@ -128,13 +127,16 @@ def parse_slack_output(slack_rtm_output):
         directed at the Bot, based on its ID.
     """
     output_list = slack_rtm_output
+    # pprint(output_list) #testing
     if output_list and len(output_list) > 0:
         for output in output_list:
-            if output and 'text' in output and AT_BOT in output['text']:
+            # if msg text contains @nutbot
+            if output and 'text' in output and AT_BOT in output['text']: 
                 # return text after the @ mention, whitespace removed
                 return output['text'].split(AT_BOT)[1].strip().lower(), \
-                       output['channel']
-    return None, None
+                       output['channel'], output['user']
+
+    return None, None, None
 
 
 
@@ -170,9 +172,9 @@ if __name__ == "__main__":
     if slack_client.rtm_connect():
         print("StarterBot connected and running!")
         while True:
-            command, channel = parse_slack_output(slack_client.rtm_read())
-            if command and channel:
-                handle_command(command, channel)
+            command, channel, user = parse_slack_output(slack_client.rtm_read())
+            if command and channel and user:
+                handle_command(command, channel, user)
             time.sleep(READ_WEBSOCKET_DELAY)
     else:
         print("Connection failed. Invalid Slack token or bot ID?")
