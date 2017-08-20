@@ -4,6 +4,7 @@ import requests
 import json
 import sqlite3
 import datetime
+import matplotlib.pyplot as plt
 
 from slackclient import SlackClient
 from settings import SLACK_ID, SLACK_TOKEN, NUT_ID, NUT_KEY
@@ -33,6 +34,9 @@ FOOD_KEYS = {'nf_calories':'calories', 'food_name':'name', 'serving_qty':'quanti
 
 # instantiate Slack clnt
 slack_client = SlackClient(SLACK_TOKEN)
+
+def 
+
 
 def get_users():
     """ returns dict of all users. key as uid and name as value """
@@ -154,6 +158,7 @@ def send_nut_query(query):
     """
     response = requests.post(NUT_URL, data=query, headers=NUT_HEADERS)
     response_dict = response.json()
+    pprint(response_dict)
     # print ("NUT API response is: \n\n\n" + response.text)
     # print ("DICT ver: \n\n\n" + response_dict)
 

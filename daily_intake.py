@@ -1,6 +1,14 @@
 # DRI: ditary reference intake
 # could not find file online...
 
+
+import csv
+with open('usda.csv', 'r') as csvfile:
+    reader = csv.reader(csvfile)
+    for row in reader:
+        print(row)
+
+
 dri = { 'Total Fat' : 65, # grams
         'Saturated Fat' : 20, # grams
         'Cholesterol' : 300, # milligrams
@@ -35,5 +43,7 @@ dri = { 'Total Fat' : 65, # grams
         'Molybdenum' : 75, #ug
         'Chloride' : 3400 #mg
         }
+
+
 
 
