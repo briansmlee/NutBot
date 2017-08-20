@@ -41,9 +41,11 @@ def db_add_food(dct, user):
     session.add(food)
     session.commit()
     
-def db_all_foods():
-    for instance in session.query(Food).order_by(Food.id):
-        print(instance) # ok?
+def db_all_foods(users):
+    """get all rows rel to input users"""
+
+    # for instance in session.query(Food).order_by(Food.id):
+    #    print(instance) # ok?
 
 
 def db_daily_summary():

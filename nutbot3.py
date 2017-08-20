@@ -30,9 +30,16 @@ NUT_HEADERS = {
 EXAMPLE_COMMAND = ['add', 'summary']
 FOOD_KEYS = {'nf_calories':'calories', 'food_name':'name', 'serving_qty':'quantity'}
 
+
 # instantiate Slack clnt
 slack_client = SlackClient(SLACK_TOKEN)
 
+def get_users():
+    """ returns dict of all users. key as uid and name as value """
+    users_list = slack_client.api_call("users.list")
+    if 'members' in users_list:
+        users = { user['id'] : user['name'] for user in users_list['members'] } 
+        return users
 
 
 def filter_keys(dct, keys):
