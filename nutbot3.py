@@ -35,8 +35,6 @@ FOOD_KEYS = {'nf_calories':'calories', 'food_name':'name', 'serving_qty':'quanti
 # instantiate Slack clnt
 slack_client = SlackClient(SLACK_TOKEN)
 
-def 
-
 
 def get_users():
     """ returns dict of all users. key as uid and name as value """
