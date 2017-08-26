@@ -32,5 +32,19 @@ dct = {
     }
         
 dv = pd.DataFrame(dct)
+
+def clean_unit(unit):
+    if '(' in unit:
+        return unit.split('(')[1].split(')')[0] 
+    elif ' ' in unit:
+        return unit.split(' ', 1)[1]
+    else:
+        return unit
+
+dv['unit'] = dv['unit'].apply(lambda x : clean_unit(x))
+dv['quantity'] = dv['quantity'].apply(lambda x : x.replace(',', ''))
+
 print('\n\n\n', dv)
+
+
 
