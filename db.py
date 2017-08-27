@@ -5,7 +5,7 @@ import sqlite3
 import datetime
 from sqlalchemy import *
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, mapper, session
 
 fmt = "%Y-%m-%d %H:%M:%S %Z"
 
@@ -18,21 +18,37 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 
-class Food(Base):
-    __tablename__ = 'food'
-    
-    id = Column(Integer, primary_key = True)
-    date_time = Column(DateTime)
-    name = Column(String)
-    quantity = Column(Integer)
-    calories = Column(Float)
-    user = Column(String)
-    
-    # optional
-    def __repr__(self):
-        return "<Food: datetime=%s name=%s, quantity=%d, calories=%f user=%s>" % \
-                (self.date_time.strftime(fmt), self.name, self.quantity, self.calories, self.user)
+##### Instead of hard-coding columns, go dynamic
+# class Food(Base):
+#     __tablename__ = 'food'
+#     
+#     id = Column(Integer, primary_key = True)
+#     date_time = Column(DateTime)
+#     name = Column(String)
+#     quantity = Column(Integer)
+#     calories = Column(Float)
+#     user = Column(String)
+#     
+#     # optional
+#     def __repr__(self):
+#         return "<Food: datetime=%s name=%s, quantity=%d, calories=%f user=%s>" % \
+#                 (self.date_time.strftime(fmt), self.name, self.quantity, self.calories, self.user)
+# 
 
+##### dynamic 
+class Food(Base):
+    pass
+    # __tablename__ = 'food'
+
+metadata = MetaData(bind=engine)
+
+t = Table('foods', metadata,
+        Column('id', Integer, primary_key=True)
+        *(Column(foodName, type_table[foodName]) for foodName in cols))
+
+metadata.create_all()
+mapper(Food, t)
+session = create_session(bind=engine, autocommit=False, autoFlush=True)
 Base.metadata.create_all(engine)
 
 def db_add_food(dct, user):
