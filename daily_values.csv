@@ -1,34 +1,34 @@
-name,daily_value
-Total Fat,65 grams (g)
-Saturated Fat,20 g
-Cholesterol,300 milligrams (mg)
-Sodium,"2,400 mg"
-Potassium,"3,500 mg"
-Total Carbohydrate,300 g
-Dietary Fiber,25 g
-Protein,50 g
-Vitamin A,"5,000 International Units (IU)"
-Vitamin C,60 mg
-Calcium,"1,000 mg"
-Iron,18 mg
-Vitamin D,400 IU
-Vitamin E,30 IU
-Vitamin K,80 micrograms µg
-Thiamin,1.5 mg
-Riboflavin,1.7 mg
-Niacin,20 mg
-Vitamin B6,2 mg
-Folate,400 µg
-Vitamin B12,6 µg
-Biotin,300 µg
-Pantothenic acid,10 mg
-Phosphorus,"1,000 mg"
-Iodine,150 µg
-Magnesium,400 mg
-Zinc,15 mg
-Selenium,70 µg
-Copper,2 mg
-Manganese,2 mg
-Chromium,120 µg
-Molybdenum,75 µg
-Chloride,"3,400 mg"
+name,daily_value,attr_id
+Total Fat,65 grams (g),204
+Saturated Fat,20 g,606
+Cholesterol,300 milligrams (mg),601
+Sodium,"2,400 mg",307
+Potassium,"3,500 mg",306
+Total Carbohydrate,300 g,-1
+Dietary Fiber,25 g,291
+Protein,50 g,203
+Vitamin A,"5,000 International Units (IU)",318
+Vitamin C,60 mg,401
+Calcium,"1,000 mg",301
+Iron,18 mg,303
+Vitamin D,400 IU,324
+Vitamin E,30 IU,323
+Vitamin K,80 micrograms µg,430
+Thiamin,1.5 mg,404
+Riboflavin,1.7 mg,405
+Niacin,20 mg,406
+Vitamin B6,2 mg,415
+Folate,400 µg,435
+Vitamin B12,6 µg,418
+Biotin,300 µg,-1
+Pantothenic acid,10 mg,410
+Phosphorus,"1,000 mg",305
+Iodine,150 µg,-1
+Magnesium,400 mg,304
+Zinc,15 mg,309
+Selenium,70 µg,317
+Copper,2 mg,312
+Manganese,2 mg,315
+Chromium,120 µg,-1
+Molybdenum,75 µg,-1
+Chloride,"3,400 mg",-1
