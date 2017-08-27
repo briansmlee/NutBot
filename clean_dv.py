@@ -72,8 +72,19 @@ usda = pd.read_csv('usda.csv', encoding=result['encoding']) # names=dv_names)
 #    result = chardet.detect(f3.read())
 # ids = pd.read_csv('attr_ids.csv', encoding=result['encoding'], dtype='int32')
 
-# join dv and usda
-print(dv, '\n\n\n', usda, '\n\n\n', dv.dtypes, '\n\n\n', usda.dtypes)
+##### join dv and usda and stores result in csv
 merged = pd.merge(dv, usda, on='attr_id')
-print(merged)
+merged.drop(merged['attr_id'] == 323)
 
+d = {
+        'attr_id' : merged['attr_id'],
+        'name' : merged['name_x'].astype(str),
+        'quantity' : merged['quantity'],
+        'unit' : merged['unit_x']
+        }
+
+final = pd.DataFrame(d)
+final.set_index('attr_id')
+print(final)
+final.to_csv('./dv.csv')
+        
