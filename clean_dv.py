@@ -40,15 +40,32 @@ print('\n\n\n', dv)
 with open('usda.csv', 'rb') as f2:
     result = chardet.detect(f2.read())
 usda = pd.read_csv('usda.csv', encoding=result['encoding']) # names=dv_names)
-print(usda)
 
-def isin_dv(usda_name, dv_names):
+
+### selecting columns with str matching names
+dv_names = [ name.lower() for name in dv['name'].tolist() ]
+def isin_dv(usda_name):
     for name in dv_names:
-        if usda_name.lower() in name: # str pattern matching. NOT finding in list
+        if name in usda_name.lower(): # str pattern matching. NOT finding in list
             return True
     return False
 
-# lower for case insensitive comparison
-dv_names = [ name.lower() for name in dv['name'].tolist() ]
-print(usda.loc[isin_dv(usda['name'], dv_names)])
+### needed less strict criteria.
+def isin_dv2(usda_name):
+    usda_str = usda_name.lower()
+    for name in dv_names:
+        if 'vitamin' in name:
+            if name in usda_str:
+                return True
+        else:
+            for word in name.split(' '):
+                if word in usda_str:
+                    return True
+    return False
+        
+criterion = usda['name'].map(isin_dv2)
+usda = usda[criterion]
+usda.set_index('name')
+dv.set_index('name')
+
 
