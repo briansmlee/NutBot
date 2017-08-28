@@ -26,43 +26,48 @@ class Consumption(Base):
     date_time = Column(DateTime) # when ate
     user = Column(String) # who ate
     food_name = Column(String) 
-    food_id = Column(String)
+    # food_id = Column(String)
     quantity = Column(Integer)
     calories = Column(Float) # move to food table?
      
     # optional
-    # def __repr__(self):
-    #    return "<Food: datetime=%s name=%s, quantity=%d, calories=%f user=%s>" % \
+    def __repr__(self):
+       return "<Food: datetime=%s name=%s, quantity=%d, calories=%f user=%s>" % \
+               (self.date_time, self.food_name, self.quantity, self.calories, self.user)
                 
 
 ##### mapping food table to class
-
+# uses dynamic column gen
 class Food(object):
     # def __init__(self, food_dct):
     pass
 
 dv_file = open('./dv.csv')
 dvReader = csv.DictReader(dv_file)
-for n in dvReader:
-    print(n)
 
 food_table = Table('food', metadata,
         Column('id', Integer, primary_key=True),
-        Column('food_id', String),
+        Column('food_name', String)
+        # Column('food_id', String),
         # dynamic column generation from daily value columns
         # use attr_id or name?
-        *(Column(nutrition['name'], Integer) for nutrition in dvReader)
+        *(Column(nutrition['name'], Float) for nutrition in dvReader)
         )
-
 
 metadata.create_all() # creates table
 mapper(Food, food_table)
-# session = create_session(bind=engine, autocommit=False, autoFlush=True)
-# Base.metadata.create_all(engine)
 
-def db_add_food(dct, user):
+def db_add_consumption(dct, user):
+    # mthd currently assumes input data fmt matches col names.
+    # need a way to reformat here?
     dct['user'] = user
-    food = Food(**dct) # unfolds dict
+    cons = Consumption(**dct) # unfolds dict
+    session.add(cons)
+    session.commit()
+
+def db_add_food(dct, food_id):
+    dct['food_id'] = food_id
+    food = Food(**dct)
     session.add(food)
     session.commit()
     

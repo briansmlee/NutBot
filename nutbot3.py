@@ -4,7 +4,7 @@ import requests
 import json
 import sqlite3
 import datetime
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 from slackclient import SlackClient
 from settings import SLACK_ID, SLACK_TOKEN, NUT_ID, NUT_KEY
@@ -29,7 +29,10 @@ NUT_HEADERS = {
         "x-remote-user-id": '0'
         }
 EXAMPLE_COMMAND = ['add', 'summary']
-FOOD_KEYS = {'nf_calories':'calories', 'food_name':'name', 'serving_qty':'quantity'}
+FOOD_KEYS = {
+        'nf_calories':'calories', 
+        'food_name':'food_name', 
+        'serving_qty':'quantity'} 
 
 
 # instantiate Slack clnt
@@ -44,12 +47,17 @@ def get_users():
         return users
 
 
-def filter_keys(dct, keys):
+def filter_consumption(dct, keys):
     new_dct = { new_key: dct[old_key] for old_key, new_key in keys.items() }
     new_dct['date_time'] = datetime.datetime.now()
     return new_dct
 
-
+def filter_food(dct, keys):
+    # filters food info (nutrients)
+    abc = [] # dict/list of ids
+    for attr_id in abc: 
+        pass # add attr_id and qty of nutrients to food db
+    
 
 def handle_command(command, channel, user):
     """
@@ -90,8 +98,11 @@ def handle_add(phrase, channel, user):
                   str(food["nf_calories"]) + '\n'
         message += add_msg
         
-        # add to db
-        db_add_food(filter_keys(food, FOOD_KEYS), user)
+        # add consumption to db
+        db_add_consumption(filter_consumption(food, FOOD_KEYS), user)
+
+        # add food info to db
+        db_add_food(filter_food(food))
 
     slack_client.api_call("chat.postMessage", channel=channel, \
                 text=message, as_user=True)
